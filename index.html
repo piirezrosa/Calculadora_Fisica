@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Calculadora de Circuitos Resistivos (FAI)</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+</html>
+<body>
+
+    <div class="board">
+        <header class="header">
+            <div class="header__trace"></div>
+            <h1 class="header__title">Calculadora de Aura</h1>
+            <p class="header__description">Calculadora de Corrente, Resistência Equivalente, Tensão e Potência (FAI)</p>
+        </header>
+
+        <nav class="tabs" role="tablist" aria-label="Tipo de acossiação">
+            <button class="tab active" data-mode="serie" role="tab" aria-selected="true">Série</button>
+            <button class="tab" data-mode="paralelo" role="tab" aria-selected="false">Paralelo</button>
+            <button class="tab" data-mode="mista" role="tab" aria-selected="false">Mista</button>
+        </nav>
+
+        <main class="panels">
+ 
+      <!-- ===================== PAINEL SÉRIE / PARALELO ===================== -->
+      <section id="painel-simples" class="panel">
+ 
+        <div class="field">
+          <label for="tensao-simples">Tensão da fonte (V)</label>
+          <input type="number" id="tensao-simples" placeholder="ex: 12" step="any" min="0" />
+        </div>
+ 
+        <div class="resistor-block">
+          <div class="resistor-block__head">
+            <span>Resistores</span>
+            <button type="button" class="btn-add" id="add-resistor-simples">+ Adicionar resistor</button>
+          </div>
+          <div id="lista-resistores-simples" class="resistor-list"></div>
+        </div>
+ 
+        <button type="button" class="btn-calcular" id="calcular-simples">Calcular</button>
+ 
+        <div id="resultado-simples" class="resultado"></div>
+      </section>
+ 
+      <!-- ===================== PAINEL MISTA ===================== -->
+      <section id="painel-mista" class="panel" hidden>
+ 
+        <div class="field">
+          <label for="tensao-mista">Tensão da fonte (V)</label>
+          <input type="number" id="tensao-mista" placeholder="ex: 24" step="any" min="0" />
+        </div>
+ 
+        <div class="field">
+          <label for="combinacao-grupos">Como os grupos se conectam entre si</label>
+          <select id="combinacao-grupos">
+            <option value="serie">Grupos em série</option>
+            <option value="paralelo">Grupos em paralelo</option>
+          </select>
+          <p class="field__hint">
+            Um circuito misto é montado como blocos: cada bloco abaixo é internamente
+            série ou paralelo, e este campo define como os blocos se ligam entre si.
+          </p>
+        </div>
+ 
+        <div class="grupos-block">
+          <div class="grupos-block__head">
+            <span>Grupos (blocos)</span>
+            <button type="button" class="btn-add" id="add-grupo">+ Adicionar grupo</button>
+          </div>
+          <div id="lista-grupos" class="grupos-list"></div>
+        </div>
+ 
+        <button type="button" class="btn-calcular" id="calcular-mista">Calcular</button>
+ 
+        <div id="resultado-mista" class="resultado"></div>
+      </section>
+ 
+    </main>
+ 
+    <footer class="footer">
+      <div class="footer__trace"></div>
+      <p>
+        Série: R<sub>eq</sub> = R₁+R₂+...  ·  Paralelo: 1/R<sub>eq</sub> = 1/R₁+1/R₂+...  ·  
+        Lei de Ohm: V = R·I  ·  Potência: P = V·I
+      </p>
+    </footer>
+ 
+  </div>
+ 
+  <script src="script.js"></script>
+</body>
+</html>
