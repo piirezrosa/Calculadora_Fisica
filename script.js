@@ -3,7 +3,7 @@ let modoAtual = "serie"; // 'serie' | 'paralelo' | 'mista'
 let contadorResistorSimples = 0;
 let contadorGrupo = 0;
 
-// Ícone SVG de um resistor (zig-zag), reaproveitado em toda linha
+// Ícone SVG de um resistor reaproveitado em toda linha
 const ICONE_RESISTOR = `
   <svg width="28" height="14" viewBox="0 0 28 14" class="resistor-row__icon">
     <path d="M0 7 H4 L7 1 L11 13 L15 1 L19 13 L23 1 L25 7 H28"
