@@ -9,14 +9,12 @@
         <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="style.css" />
     </head>
-</html>
 <body>
-
     <div class="board">
         <header class="header">
             <div class="header__trace"></div>
             <h1 class="header__title">Calculadora de Aura</h1>
-            <p class="header__description">Calculadora de Corrente, Resistência Equivalente, Tensão e Potência (FAI)</p>
+            <p class="header__description">Calculadora de Corrente, Resistência Equivalente, Tensão e Potência (FAI-3)</p>
         </header>
 
         <nav class="tabs" role="tablist" aria-label="Tipo de acossiação">
@@ -31,7 +29,7 @@
       <section id="painel-simples" class="panel">
  
         <div class="field">
-          <label for="tensao-simples">Tensão da fonte (V)</label>
+          <label for="tensao-simples">Tensão da fonte (em V)</label>
           <input type="number" id="tensao-simples" placeholder="ex: 12" step="any" min="0" />
         </div>
  
@@ -90,9 +88,7 @@
         Lei de Ohm: V = R·I  ·  Potência: P = V·I
       </p>
     </footer>
- 
   </div>
- 
   <script src="script.js"></script>
 </body>
 </html>
