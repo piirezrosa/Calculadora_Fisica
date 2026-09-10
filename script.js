@@ -1,16 +1,22 @@
-/* ESTADO E CONSTANTES */
+/* =========================================================
+   ESTADO E CONSTANTES
+   ========================================================= */
 let modoAtual = "serie"; // 'serie' | 'paralelo' | 'mista'
 let contadorResistorSimples = 0;
 let contadorGrupo = 0;
 
-// Ícone SVG de um resistor reaproveitado em toda linha
+const LIMITE_CORRENTE_AMPERES = 10; // a partir daqui, dispara o alerta
+
+// Ícone SVG de um resistor (zig-zag), reaproveitado em toda linha
 const ICONE_RESISTOR = `
   <svg width="28" height="14" viewBox="0 0 28 14" class="resistor-row__icon">
     <path d="M0 7 H4 L7 1 L11 13 L15 1 L19 13 L23 1 L25 7 H28"
           fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
   </svg>`;
 
-/* TROCA DE ABAS (SÉRIE / PARALELO / MISTA) */
+/* =========================================================
+   TROCA DE ABAS (SÉRIE / PARALELO / MISTA)
+   ========================================================= */
 const tabs = document.querySelectorAll(".tab");
 const painelSimples = document.getElementById("painel-simples");
 const painelMista = document.getElementById("painel-mista");
@@ -32,7 +38,9 @@ tabs.forEach((tab) => {
   });
 });
 
-/* PAINEL SÉRIE / PARALELO — construção dinâmica das linhas */
+/* =========================================================
+   PAINEL SÉRIE / PARALELO — construção dinâmica das linhas
+   ========================================================= */
 const listaResistoresSimples = document.getElementById("lista-resistores-simples");
 
 function criarLinhaResistor(container, numero) {
@@ -59,7 +67,9 @@ document.getElementById("add-resistor-simples").addEventListener("click", () => 
 criarLinhaResistor(listaResistoresSimples, ++contadorResistorSimples);
 criarLinhaResistor(listaResistoresSimples, ++contadorResistorSimples);
 
-/* PAINEL MISTA — construção dinâmica de grupos */
+/* =========================================================
+   PAINEL MISTA — construção dinâmica de grupos
+   ========================================================= */
 const listaGrupos = document.getElementById("lista-grupos");
 
 function criarGrupo() {
@@ -102,7 +112,9 @@ document.getElementById("add-grupo").addEventListener("click", criarGrupo);
 criarGrupo();
 criarGrupo();
 
-/* FUNÇÕES AUXILIARES DE FÍSICA (puras, sem tocar no DOM) */
+/* =========================================================
+   FUNÇÕES AUXILIARES DE FÍSICA (puras, sem tocar no DOM)
+   ========================================================= */
 
 // R_eq de resistores em série: soma simples
 function reqSerie(resistencias) {
@@ -121,7 +133,9 @@ function fmt(numero) {
   return Number(numero.toFixed(4)).toString();
 }
 
-/* LEITURA DOS INPUTS */
+/* =========================================================
+   LEITURA DOS INPUTS
+   ========================================================= */
 
 // Lê todos os valores de resistores dentro de um container, ignorando vazios/inválidos
 function lerResistencias(container) {
@@ -134,7 +148,39 @@ function lerResistencias(container) {
   return valores;
 }
 
-/* CÁLCULO — MODO SÉRIE / PARALELO */
+/* =========================================================
+   ALERTA DE CORRENTE ALTA (> 10 A)
+   ========================================================= */
+const alertaCorrente = document.getElementById("alerta-corrente");
+const alertaCorrenteValor = document.getElementById("alerta-corrente__valor");
+let timeoutAlerta = null; // guarda o "agendamento" para poder cancelar/reiniciar
+
+function mostrarAlertaCorrente(correnteAmperes) {
+  alertaCorrenteValor.textContent =
+    `Corrente calculada: ${fmt(correnteAmperes)} A (limite: ${LIMITE_CORRENTE_AMPERES} A)`;
+
+  // Se já havia um alerta visível e um novo cálculo dispara de novo,
+  // reinicia a animação de entrada removendo e re-adicionando a classe
+  // no próximo frame — assim o "shake" toca de novo mesmo se já estava aberto.
+  alertaCorrente.classList.remove("is-visible");
+  void alertaCorrente.offsetWidth; // força o navegador a "recalcular" antes de reativar
+  alertaCorrente.classList.add("is-visible");
+
+  // Fecha sozinho depois de um tempo, mas o usuário também pode fechar antes
+  clearTimeout(timeoutAlerta);
+  timeoutAlerta = setTimeout(esconderAlertaCorrente, 6000);
+}
+
+function esconderAlertaCorrente() {
+  alertaCorrente.classList.remove("is-visible");
+  clearTimeout(timeoutAlerta);
+}
+
+document.getElementById("alerta-corrente-fechar").addEventListener("click", esconderAlertaCorrente);
+
+/* =========================================================
+   CÁLCULO — MODO SÉRIE / PARALELO
+   ========================================================= */
 document.getElementById("calcular-simples").addEventListener("click", () => {
   const areaResultado = document.getElementById("resultado-simples");
   const tensao = parseFloat(document.getElementById("tensao-simples").value);
@@ -175,9 +221,17 @@ document.getElementById("calcular-simples").addEventListener("click", () => {
     potenciaTotal,
     linhas: linhasTabela,
   });
+
+  // Dispara o alerta se a corrente TOTAL do circuito passar do limite.
+  // Fica depois do render pra garantir que o card "stat--perigo" já existe no DOM.
+  if (correnteTotal > LIMITE_CORRENTE_AMPERES) {
+    mostrarAlertaCorrente(correnteTotal);
+  }
 });
 
-/* CÁLCULO — MODO MISTA */
+/* =========================================================
+   CÁLCULO — MODO MISTA
+   ========================================================= */
 document.getElementById("calcular-mista").addEventListener("click", () => {
   const areaResultado = document.getElementById("resultado-mista");
   const tensao = parseFloat(document.getElementById("tensao-mista").value);
@@ -259,9 +313,16 @@ document.getElementById("calcular-mista").addEventListener("click", () => {
     potenciaTotal,
     linhas: linhasTabela,
   });
+
+  // Mesma checagem do modo simples, aplicada à corrente total do circuito misto.
+  if (correnteTotal > LIMITE_CORRENTE_AMPERES) {
+    mostrarAlertaCorrente(correnteTotal);
+  }
 });
 
-/* RENDERIZAÇÃO DO RESULTADO (compartilhada pelos dois modos) */
+/* =========================================================
+   RENDERIZAÇÃO DO RESULTADO (compartilhada pelos dois modos)
+   ========================================================= */
 function renderizarResultado({ req, correnteTotal, potenciaTotal, linhas }) {
   const linhasHtml = linhas
     .map(
@@ -276,13 +337,17 @@ function renderizarResultado({ req, correnteTotal, potenciaTotal, linhas }) {
     )
     .join("");
 
+  // A classe "stat--perigo" só entra no card de Corrente Total quando o
+  // valor ultrapassa o limite — é ela que aciona o pulso vermelho no CSS.
+  const classeCorrentePerigo = correnteTotal > LIMITE_CORRENTE_AMPERES ? "stat--perigo" : "";
+
   return `
     <div class="resultado__stats">
       <div class="stat">
         <div class="stat__label">R equivalente</div>
         <div class="stat__value">${fmt(req)} Ω</div>
       </div>
-      <div class="stat">
+      <div class="stat ${classeCorrentePerigo}">
         <div class="stat__label">Corrente total</div>
         <div class="stat__value">${fmt(correnteTotal)} A</div>
       </div>

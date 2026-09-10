@@ -1,38 +1,42 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Calculadora de Circuitos Resistivos (FAI-3)</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" href="style.css" />
-    </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Malha — Calculadora de Circuitos Resistivos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
 <body>
-    <div class="board">
-        <header class="header">
-            <div class="header__trace"></div>
-            <h1 class="header__title">Calculadora de Circuitos Resistivos</h1>
-            <p class="header__description">Calculadora de Corrente, Resistência Equivalente, Tensão e Potência (FAI-3)</p>
-        </header>
 
-        <nav class="tabs" role="tablist" aria-label="Tipo de acossiação">
-            <button class="tab active" data-mode="serie" role="tab" aria-selected="true">Série</button>
-            <button class="tab" data-mode="paralelo" role="tab" aria-selected="false">Paralelo</button>
-            <button class="tab" data-mode="mista" role="tab" aria-selected="false">Mista</button>
-        </nav>
+  <div class="board">
 
-        <main class="panels">
- 
-      <!-- PAINEL SÉRIE / PARALELO -->
+    <!-- Cabeçalho -->
+    <header class="header">
+      <div class="header__trace"></div>
+      <h1 class="header__title">Malha</h1>
+      <p class="header__subtitle">Calculadora de Corrente, Resistência Equivalente, Tensão e Potência</p>
+    </header>
+
+    <!-- Seletor de modo (abas) -->
+    <nav class="tabs" role="tablist" aria-label="Tipo de associação">
+      <button class="tab active" data-mode="serie" role="tab" aria-selected="true">Série</button>
+      <button class="tab" data-mode="paralelo" role="tab" aria-selected="false">Paralelo</button>
+      <button class="tab" data-mode="mista" role="tab" aria-selected="false">Mista</button>
+    </nav>
+
+    <main class="panels">
+
+      <!-- ===================== PAINEL SÉRIE / PARALELO ===================== -->
       <section id="painel-simples" class="panel">
- 
+
         <div class="field">
-          <label for="tensao-simples">Tensão da fonte (em V)</label>
+          <label for="tensao-simples">Tensão da fonte (V)</label>
           <input type="number" id="tensao-simples" placeholder="ex: 12" step="any" min="0" />
         </div>
- 
+
         <div class="resistor-block">
           <div class="resistor-block__head">
             <span>Resistores</span>
@@ -40,20 +44,20 @@
           </div>
           <div id="lista-resistores-simples" class="resistor-list"></div>
         </div>
- 
+
         <button type="button" class="btn-calcular" id="calcular-simples">Calcular</button>
- 
+
         <div id="resultado-simples" class="resultado"></div>
       </section>
- 
-      <!-- PAINEL MISTA -->
+
+      <!-- ===================== PAINEL MISTA ===================== -->
       <section id="painel-mista" class="panel" hidden>
- 
+
         <div class="field">
           <label for="tensao-mista">Tensão da fonte (V)</label>
           <input type="number" id="tensao-mista" placeholder="ex: 24" step="any" min="0" />
         </div>
- 
+
         <div class="field">
           <label for="combinacao-grupos">Como os grupos se conectam entre si</label>
           <select id="combinacao-grupos">
@@ -65,7 +69,7 @@
             série ou paralelo, e este campo define como os blocos se ligam entre si.
           </p>
         </div>
- 
+
         <div class="grupos-block">
           <div class="grupos-block__head">
             <span>Grupos (blocos)</span>
@@ -73,14 +77,14 @@
           </div>
           <div id="lista-grupos" class="grupos-list"></div>
         </div>
- 
+
         <button type="button" class="btn-calcular" id="calcular-mista">Calcular</button>
- 
+
         <div id="resultado-mista" class="resultado"></div>
       </section>
- 
+
     </main>
- 
+
     <footer class="footer">
       <div class="footer__trace"></div>
       <p>
@@ -88,7 +92,25 @@
         Lei de Ohm: V = R·I  ·  Potência: P = V·I
       </p>
     </footer>
+
   </div>
+
+  <!-- ===================== ALERTA DE CORRENTE ALTA ===================== -->
+  <!-- Fica escondido por padrão (classe "alerta-corrente" sem "is-visible").
+       O JS adiciona "is-visible" quando a corrente total calculada > 10 A. -->
+  <div id="alerta-corrente" class="alerta-corrente" role="alert" aria-live="assertive">
+    <div class="alerta-corrente__caixa">
+      <svg class="alerta-corrente__icone" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M12 2 1 21h22L12 2Zm0 4.7 7.5 13H4.5L12 6.7ZM11 10h2v5h-2v-5Zm0 6.5h2v2h-2v-2Z"/>
+      </svg>
+      <div class="alerta-corrente__texto">
+        <strong>Corrente acima do limite seguro</strong>
+        <span id="alerta-corrente__valor"></span>
+      </div>
+      <button type="button" class="alerta-corrente__fechar" id="alerta-corrente-fechar" aria-label="Fechar alerta">×</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
